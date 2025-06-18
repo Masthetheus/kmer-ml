@@ -53,6 +53,7 @@ This project is being developed as part of a Master's course subject and is curr
 - ❌ Visualization tools
 - ❌ Analysis tools
 - ❌ Final panoram
+  
 Legend: ✅ Implemented | 🔄 In progress | ❌ Planned
 
 ---
