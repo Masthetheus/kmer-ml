@@ -1,7 +1,7 @@
 # kmer-ml
 
 [![Status: Alpha](https://img.shields.io/badge/Status-Alpha-yellow)](https://github.com/Masthetheus/kmer-ml)
-[![Version](https://img.shields.io/badge/version-0.1.0--alpha-orange)](https://github.com/Masthetheus/kmer-ml)
+[![Version](https://img.shields.io/badge/version-0.2.0--alpha-orange)](https://github.com/Masthetheus/kmer-ml)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
