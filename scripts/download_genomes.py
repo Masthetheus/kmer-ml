@@ -18,7 +18,7 @@ def main():
 
     accession_file = args.accession_list
     print(f"Using accession file: {accession_file}")
-    print("Do you want to specify a custom .csv/.tsv column name for the accession numbers? (y/n)")
+    print("Do you want to specify a custom .csv/.tsv column name for the accession numbers? (y/[n])")
     custom_column = input().strip().lower() == 'y'
     if custom_column:
         column_name = input("Enter the column name (NCBI default is 'Assembly Accession'): ").strip() or "Assembly Accession"
