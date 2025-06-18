@@ -1,0 +1,12 @@
+data/raw/*
+data/processed/*
+data/logs/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/logs/.gitkeep
+*.csv
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
