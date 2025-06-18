@@ -7,7 +7,7 @@ import time
 from kmerml.utils.progress import progress_bar
 from kmerml.utils.logger import setup_logging
 
-logger = setup_logging()
+logger = setup_logging('ncbidownload')
 
 def read_accession_txt(filepath):
     """

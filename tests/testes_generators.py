@@ -1,5 +1,5 @@
 import os
-from kmerml.kmers import kmer_stats, process_genome
+from kmerml.kmers.generators import kmer_stats, process_genome
 
 def main():
     fasta_dir = "data/raw/"
@@ -9,6 +9,7 @@ def main():
     fasta_files = [os.path.join(fasta_dir, f) for f in os.listdir(fasta_dir) if f.endswith(".fasta") or f.endswith(".fa")]
     for fasta in fasta_files:
         for k in ks:
+            print(f"Processing {fasta} with k={k}")
             process_genome(fasta, k, out_dir)
 
 if __name__ == "__main__":
