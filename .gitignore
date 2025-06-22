@@ -5,6 +5,7 @@ data/logs/*
 !data/processed/.gitkeep
 !data/logs/.gitkeep
 *.csv
+*.tsv
 __pycache__/
 *.py[cod]
 *.egg-info/
