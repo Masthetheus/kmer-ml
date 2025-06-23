@@ -1,5 +1,5 @@
-from kmerml.in_test_kmer.generate import KmerExtractor
-from kmerml.in_test_kmer.statistics import KmerStatistics
+from kmerml.kmers.generate import KmerExtractor
+from kmerml.kmers.statistics import KmerStatistics
 
 # Initialize extractor
 extractor = KmerExtractor(output_dir="data/processed/", compress=False)
