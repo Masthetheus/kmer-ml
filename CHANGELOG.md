@@ -1,11 +1,23 @@
 # Changelog
 All notable changes to kmerml will be documented in this file.
 
-## [0.3.0] - 2025-06-18
+## [0.3.0] - 2025-06-23
 ### Added
-- 
+- utils: Genome metadata generator, to store general genome characteristics.
+- utils: Kmer metadata generator, to store a kmer analysis summary to the metadata file.
+- utils: Path utils, for repetitive path and file manipulation functions.
+- kmers: Generate, that exports in .txt or compressed all kmers for given k-values and their occurence total.
+- kmers: Statistics, calculates and exports in csv, per organism and per kmer, metrics of interest.
+- tests: Gerar_kmer, testing for kmer generation pipeline.
+- tests: Retrieve_metadata, testing for metadata fetching and/or calculation.
+
 ### Fixed
 - utils: Logger overwrite fixed
+
+### In Progress
+- scripts: Metadata, allows metadata generation.
+- scripts: Kmer Dataset, allows kmer data set data generation.
+- readme: full description with usage and examples of newly added functions.
 
 ## [0.2.0] - 2025-06-18
 ### Added
