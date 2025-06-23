@@ -1,15 +1,11 @@
-import os
 import gzip
 from collections import defaultdict
 from pathlib import Path
-import multiprocessing as mp
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from Bio import SeqIO
+from kmerml.utils.path_utils import ensure_directory_exists
 
 class KmerExtractor:
-    """
-    Extract k-mers from genomic sequences for multiple k values.
-    Optimized for processing multiple organisms in parallel.
-    """
+    """Extract k-mers from genomic sequences for multiple k values."""
     
     def __init__(self, output_dir="kmer_data", compress=True):
         """
@@ -19,8 +15,7 @@ class KmerExtractor:
             output_dir (str): Directory to save k-mer files
             compress (bool): Whether to compress output files using gzip
         """
-        self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(exist_ok=True)
+        self.output_dir = ensure_directory_exists(Path(output_dir))
         self.compress = compress
     
     def extract_kmers_from_fasta(self, fasta_file, k_values, organism_id=None):
@@ -32,11 +27,7 @@ class KmerExtractor:
             k_values (list): List of k values to extract
             organism_id (str): Identifier for the organism (defaults to filename if None)
         """
-        try:
-            from Bio import SeqIO
-        except ImportError:
-            raise ImportError("BioPython is required. Install with: pip install biopython")
-        
+
         # Extract organism ID from filename if not provided
         if organism_id is None:
             organism_id = Path(fasta_file).stem
@@ -75,15 +66,20 @@ class KmerExtractor:
         return organism_id
     
     def _save_kmers_to_file(self, kmers, organism_id, k):
-        """Save k-mers with numeric encoding"""
+        """Save k-mers with numeric encoding in organism-specific folders"""
         # Define encoding
         encoding = {'A': 0, 'T': 1, 'C': 2, 'G': 3}
         
-        filename = f"{organism_id}_k{k}.txt"
+        # Create organism-specific directory
+        organism_dir = self.output_dir / organism_id
+        ensure_directory_exists(organism_dir)
+        
+        # Create filename within organism directory
+        filename = f"k{k}.txt"
         if self.compress:
             filename += ".gz"
         
-        filepath = self.output_dir / filename
+        filepath = organism_dir / filename
         
         open_func = gzip.open if self.compress else open
         mode = 'wt' if self.compress else 'w'
@@ -94,68 +90,40 @@ class KmerExtractor:
                 numeric_kmer = ''.join(str(encoding.get(base, 'X')) for base in kmer)
                 f.write(f"{numeric_kmer}\t{count}\n")
     
-    def batch_extract(self, sequences, k_values, batch_size=10):
+    def extract_from_genome_list(self, genome_paths, k_values, organism_ids=None):
         """
-        Process organisms in batches to manage memory.
+        Extract k-mers from multiple genome files for multiple k values.
         
         Args:
-            sequences (list): List of (organism_id, sequence) tuples
+            genome_paths (list): List of paths to FASTA genome files
             k_values (list): List of k values to extract
-            batch_size (int): Number of organisms to process in each batch
-        """
-        for i in range(0, len(sequences), batch_size):
-            batch = sequences[i:i+batch_size]
-            for organism_id, sequence in batch:
-                self.extract_kmers_to_file(sequence, organism_id, k_values)
-                print(f"Processed {organism_id}")
-    
-    def parallel_extract(self, sequences, k_values, max_workers=None):
-        """
-        Process organisms in parallel using multiple CPU cores.
-        This is much faster for multiple organisms.
-        
-        Args:
-            sequences (list): List of (organism_id, sequence) tuples
-            k_values (list): List of k values to extract
-            max_workers (int): Maximum number of parallel workers
-        """
-        # Determine optimal number of workers
-        if max_workers is None:
-            max_workers = max(1, mp.cpu_count() - 1)  # Leave one core free
-            
-        print(f"Using {max_workers} CPU cores for parallel processing")
-        
-        with ProcessPoolExecutor(max_workers=max_workers) as executor:
-            # Submit jobs - one job per organism
-            futures = []
-            for organism_id, sequence in sequences:
-                future = executor.submit(
-                    self._process_single_organism, 
-                    sequence, 
-                    organism_id, 
-                    k_values
-                )
-                futures.append((future, organism_id))
-            
-            # Process results as they complete
-            for future, organism_id in futures:
-                try:
-                    future.result()  # This will raise any exceptions that occurred
-                    print(f"Completed processing {organism_id}")
-                except Exception as e:
-                    print(f"Error processing {organism_id}: {str(e)}")
-    
-    def _process_single_organism(self, sequence, organism_id, k_values):
-        """
-        Process a single organism (for parallel execution).
-        
-        Args:
-            sequence (str): The DNA/RNA sequence
-            organism_id (str): Identifier for the organism
-            k_values (list): List of k values to extract
-            
+            organism_ids (list, optional): List of organism identifiers.
+                If None, will use filenames as identifiers.
+                
         Returns:
-            str: The organism_id that was processed
+            list: List of processed organism IDs
         """
-        self.extract_kmers_to_file(sequence, organism_id, k_values)
-        return organism_id
+        if organism_ids is None:
+            organism_ids = [Path(path).stem for path in genome_paths]
+        
+        # Validate input lists have matching lengths
+        if len(organism_ids) != len(genome_paths):
+            raise ValueError("Number of organism IDs must match number of genome paths")
+        
+        processed_ids = []
+        
+        # Process each genome
+        for i, fasta_path in enumerate(genome_paths):
+            org_id = organism_ids[i]
+            print(f"Processing genome {org_id} ({i+1}/{len(genome_paths)})")
+            
+            try:
+                # Extract k-mers for this genome
+                self.extract_kmers_from_fasta(fasta_path, k_values, org_id)
+                processed_ids.append(org_id)
+                print(f"Completed {org_id}")
+            except Exception as e:
+                print(f"Error processing {org_id}: {str(e)}")
+        
+        print(f"Completed processing {len(processed_ids)} out of {len(genome_paths)} genomes")
+        return processed_ids

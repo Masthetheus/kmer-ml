@@ -6,6 +6,7 @@ import gzip
 import time
 from kmerml.utils.progress import progress_bar
 from kmerml.utils.logger import setup_logging
+from kmerml.utils.path_utils import ensure_directory_exists
 
 logger = setup_logging('ncbidownload')
 
@@ -173,14 +174,14 @@ def download_genome_bioentrez(accessions, out):
             print(f"Some accessions could not be found. Check the log file (data/logs/entrez.log) for details.")
 
     # Makes sure output directory exists
-    os.makedirs(out, exist_ok=True)
+    out_dir = ensure_directory_exists(out)
     for organism, link in links.items():
         # Sets file name
         file_name = organism.replace('.', '_')
         # Initiate download
         response = requests.get(link, stream=True)
         if response.status_code == 200:
-            file_path = out+file_name+'.gz'
+            file_path = out_dir+file_name+'.gz'
             with open(file_path, "wb") as f:
                 for chunk in response.iter_content(chunk_size=1024):
                     f.write(chunk)

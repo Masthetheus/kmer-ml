@@ -1,30 +1,22 @@
 from kmerml.kmers.generate import KmerExtractor
-from kmerml.kmers.statistics import KmerStatistics
-
+from kmerml.kmers.statistics import KmerFeatureExtractor
+from kmerml.utils.path_utils import find_files
+from kmerml.utils.genome_metadata import GenomeMetadataManager
 # Initialize extractor
-extractor = KmerExtractor(output_dir="data/processed/", compress=False)
-
+extractor = KmerExtractor(output_dir="data/processed/kmers/", compress=False)
+genomes = find_files("data/raw/", patterns=["*.fa", "*.fasta"], recursive=True)
 # Define k values to extract
-k_values = [5, 6, 7, 8, 9, 10]
+k_values = [8, 9, 10, 11, 12]
 
 # Process in parallel (recommended for multiple organisms)
-extractor.extract_kmers_from_fasta(fasta_file="data/raw/teste.fasta", k_values=k_values, organism_id="teste")
+#extractor.extract_from_genome_list(genomes, k_values)
+kmer_files = find_files("data/processed/kmers", patterns=["*.txt"], recursive=True)
 
-def main():
-    parser = argparse.ArgumentParser(description="Generate statistics from k-mer files")
-    parser.add_argument("--input_dir", default="data/processed", help="Directory containing k-mer files")
-    parser.add_argument("--output", default="kmer_statistics.csv", help="Output CSV file")
-    parser.add_argument("--pattern", default="*_k*.txt*", help="File pattern to match")
-    args = parser.parse_args()
-    
-    try:
-        stats = KmerStatistics(input_dir=args.input_dir)
-        stats.save_stats_to_csv(args.output, args.pattern)
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        return 1
-    
-    return 0
+feature_extractor = KmerFeatureExtractor(
+    input_paths=kmer_files,
+    output_dir="data/processed/features",
+    metadata_file="data/metadata/genome_metadata.json"
+)
 
-if __name__ == "__main__":
-    exit(main())
+output_files = feature_extractor.extract_features()
+print(f"Extracted features saved to: {output_files}")
