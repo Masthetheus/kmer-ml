@@ -8,7 +8,7 @@ def main():
     parser = argparse.ArgumentParser(description="Generate ML features from k-mer files")
     
     # Input options
-    parser.add_argument("--input", "-i", required=True, 
+    parser.add_argument("--input", "-i", default = 'data/processed/kmers/', 
                        help="Input directory with k-mer files")
     
     # Output options
