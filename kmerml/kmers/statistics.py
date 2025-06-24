@@ -149,8 +149,7 @@ class KmerFeatureExtractor:
             kmer_features = {
                 'kmer': kmer,
                 'count': count,
-                'k': k_val,
-                'organism': organism
+                'k': k_val
             }
             
             # Add additional requested features
