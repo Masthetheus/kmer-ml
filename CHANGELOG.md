@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to kmerml will be documented in this file.
 
+## [Unreleased]
+### In Progress
+- scripts: Metadata, allows metadata generation.
+- scripts: Kmer Dataset, allows kmer data set data generation.
+- readme: full description with usage and examples of newly added functions.
+- Machine Learning implementation.
+
+### Coming Soon
+- Visualization for clustering results
+- Command-line interface for ML pipelines
+
 ## [0.3.0] - 2025-06-23
 ### Added
 - utils: Genome metadata generator, to store general genome characteristics.
@@ -13,11 +24,6 @@ All notable changes to kmerml will be documented in this file.
 
 ### Fixed
 - utils: Logger overwrite fixed
-
-### In Progress
-- scripts: Metadata, allows metadata generation.
-- scripts: Kmer Dataset, allows kmer data set data generation.
-- readme: full description with usage and examples of newly added functions.
 
 ## [0.2.0] - 2025-06-18
 ### Added
@@ -35,7 +41,7 @@ All notable changes to kmerml will be documented in this file.
 - Basic project structure
 - Base project documentation
 
-[Unreleased]: https://github.com/username/kmerml/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/username/kmerml/compare/v0.3.0...HEAD
 [0.3.0]: https://github.com/username/kmerml/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/username/kmerml/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/username/kmerml/releases/tag/v0.1.0
