@@ -1,16 +1,21 @@
 from kmerml.ml.features import KmerFeatureBuilder
 
-# Build feature matrix from k-mer files
-feature_builder = KmerFeatureBuilder("data/processed/features")
-feature_matrix = feature_builder.build_from_statistics_files(k_value=8)
+# Initialize builder
+builder = KmerFeatureBuilder("data/features/")
 
-# Normalize and filter features
-normalized = feature_builder.normalize(method="frequency")
-filtered = feature_builder.filter_features(min_prevalence=0.2, min_variance=0.001)
+# Build matrices with different metrics
+count_matrix = builder.build_from_statistics_files(metric="count")
+gc_matrix = builder.build_from_statistics_files(metric="gc_percent")
+entropy_matrix = builder.build_from_statistics_files(metric="shannon_entropy")
 
-# Get top features for clustering
-top_features = feature_builder.get_top_features(n_features=500, method="variance")
+# Show results
+print("Count matrix:")
+print(count_matrix)
+print("\nGC content matrix:")
+print(gc_matrix)
+print("\nEntropy matrix:")
+print(entropy_matrix)
 
-print(f"Original features: {feature_matrix.shape[1]}")
-print(f"After filtering: {filtered.shape[1]}")
-print(f"Top features: {top_features.shape[1]}")
+# Access organism and k-mer lists
+print(f"\nOrganisms: {builder.organisms}")
+print(f"K-mers: {builder.kmers}")

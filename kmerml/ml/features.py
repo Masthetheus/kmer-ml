@@ -42,7 +42,8 @@ class KmerFeatureBuilder:
         # Find statistics files
         if not self.stats_dir:
             raise ValueError("Statistics directory not set")
-            
+        print(f"Searching for statistics files in: {self.stats_dir}")
+        print(self.stats_dir)
         stats_files = find_files(self.stats_dir, patterns=[file_pattern], recursive=True)
         
         if not stats_files:

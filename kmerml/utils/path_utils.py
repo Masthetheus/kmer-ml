@@ -14,7 +14,6 @@ def find_files(directory, patterns=None, recursive=False):
     Returns:
         list: List of Path objects to matching files
     """
-    from pathlib import Path
     
     directory = Path(directory)
     
