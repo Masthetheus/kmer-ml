@@ -105,7 +105,7 @@ class KmerFeatureExtractor:
 
         # For the progress bar
         kmertot = len(kmer_files)
-        cont = 1
+        cont = 0
         start = time.time()
 
         for kmer_file in kmer_files:
@@ -124,8 +124,9 @@ class KmerFeatureExtractor:
             )
             all_features.extend(file_features)
 
-            start = progress_bar(cont, kmertot, start_time=start, title="K values processed")
             cont += 1
+            start = progress_bar(cont, kmertot, start_time=start, title="K values processed")
+            
         
         # Create DataFrame
         if not all_features:
