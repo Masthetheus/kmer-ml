@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import math
 from collections import defaultdict
+import time
+from kmerml.utils.progress import progress_bar
 
 class KmerFeatureExtractor:
     """Extract machine learning features from k-mer data"""
@@ -51,6 +53,11 @@ class KmerFeatureExtractor:
         # Group files by organism
         files_by_organism = self._group_files_by_organism()
         
+        # For progress bar
+        organisms = list(files_by_organism.keys())
+        organisms = len(organisms)
+        cont = 1
+        start = time.time()
         # Process each organism
         output_files = {}
         for organism, files in files_by_organism.items():
@@ -58,6 +65,8 @@ class KmerFeatureExtractor:
                 organism, files, required_features
             )
             output_files[organism] = output_csv
+            start = progress_bar(cont, organisms, start_time=start, title="Organisms processed")
+            cont += 1
             
         return output_files
     
@@ -97,7 +106,12 @@ class KmerFeatureExtractor:
         
         # Process each k-mer file
         all_features = []
-        
+
+        # For the progress bar
+        kmertot = len(kmer_files)
+        cont = 1
+        start = time.time()
+
         for kmer_file in kmer_files:
             # Extract k value
             k_val = self._extract_k_from_filename(kmer_file.name)
@@ -113,6 +127,9 @@ class KmerFeatureExtractor:
                 df, k_val, organism, required_features
             )
             all_features.extend(file_features)
+
+            start = progress_bar(cont, kmertot, start_time=start, title="K values processed")
+            cont += 1
         
         # Create DataFrame
         if not all_features:
