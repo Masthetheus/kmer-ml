@@ -96,13 +96,9 @@ class KmerFeatureExtractor:
         """Process all k-mer files for an organism"""
         # Get genome metadata if available
         genome_size = None
-        gc_content = None
         
         if hasattr(self, 'metadata_manager'):
             genome_size = self.metadata_manager.get_genome_size(organism)
-            # Try to get GC content if available
-            if organism in self.metadata_manager.metadata:
-                gc_content = self.metadata_manager.metadata[organism].get('gc_content')
         
         # Process each k-mer file
         all_features = []
@@ -141,8 +137,6 @@ class KmerFeatureExtractor:
         # Add genome metadata
         if genome_size:
             result_df['genome_size'] = genome_size
-        if gc_content:
-            result_df['genome_gc_content'] = gc_content
         
         # Save to CSV
         output_file = self.output_dir / f"{organism}_kmer_features.csv"
