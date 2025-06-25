@@ -136,14 +136,15 @@ def convert_fasta_to_uppercase(file_path, file_uncompressed):
     Converts a gzipped FASTA file to uppercase and writes to output_path.
     Decompress all .gz files in the specified directory and remove the original compressed files.
     Args:
-        file_path (str): Path to the gzipped FASTA file.
-        file_uncompressed (str): Path to the output uncompressed FASTA file.
+        file_path (str or Path): Path to the gzipped FASTA file.
+        file_uncompressed (str or Path): Path to the output uncompressed FASTA file.
     Returns:
         list: List of decompressed file paths.
     """
 
-    # Detect if gzipped
-    open_func = gzip.open if file_path.endswith('.gz') else open
+    # Detect if gzipped - use suffix instead of endswith for Path objects
+    open_func = gzip.open if file_path.suffix == '.gz' else open
+    
     with open_func(file_path, 'rt') as fin, open(file_uncompressed, 'w') as fout:
         for line in fin:
             if line.startswith('>'):
@@ -181,11 +182,11 @@ def download_genome_bioentrez(accessions, out):
         # Initiate download
         response = requests.get(link, stream=True)
         if response.status_code == 200:
-            file_path = out_dir+file_name+'.gz'
+            file_path = out_dir / f"{file_name}.gz"
             with open(file_path, "wb") as f:
                 for chunk in response.iter_content(chunk_size=1024):
                     f.write(chunk)
-            file_uncompressed = file_path[:-3] + '.fa'  # Remove .gz extension    
+            file_uncompressed = file_path.with_suffix('.fa')  
             convert_fasta_to_uppercase(file_path, file_uncompressed )
         else:
             print(f"Error during download of {organism}: {response.status_code}")
