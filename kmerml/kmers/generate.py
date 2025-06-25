@@ -3,6 +3,8 @@ from collections import defaultdict
 from pathlib import Path
 from Bio import SeqIO
 from kmerml.utils.path_utils import ensure_directory_exists
+import time
+import concurrent.futures
 
 class KmerExtractor:
     """Extract k-mers from genomic sequences for multiple k values."""
@@ -90,18 +92,30 @@ class KmerExtractor:
                 numeric_kmer = ''.join(str(encoding.get(base, 'X')) for base in kmer)
                 f.write(f"{numeric_kmer}\t{count}\n")
     
-    def extract_from_genome_list(self, genome_paths, k_values, organism_ids=None):
+    def _process_single_genome(self, args):
+        """Helper method for parallel processing of a single genome"""
+        fasta_path, org_id, k_values = args
+        try:
+            self.extract_kmers_from_fasta(fasta_path, k_values, org_id)
+            return (org_id, True, None)
+        except Exception as e:
+            return (org_id, False, str(e))
+    
+    def extract_from_genome_list(self, genome_paths, k_values, organism_ids=None, 
+                                    n_processes=None):
         """
-        Extract k-mers from multiple genome files for multiple k values.
+        Extract k-mers from multiple genome files for multiple k values in parallel.
         
         Args:
             genome_paths (list): List of paths to FASTA genome files
             k_values (list): List of k values to extract
             organism_ids (list, optional): List of organism identifiers.
                 If None, will use filenames as identifiers.
+            n_processes (int, optional): Number of parallel processes to use.
+                If None, uses number of CPU cores.
                 
         Returns:
-            list: List of processed organism IDs
+            list: List of successfully processed organism IDs
         """
         if organism_ids is None:
             organism_ids = [Path(path).stem for path in genome_paths]
@@ -110,20 +124,51 @@ class KmerExtractor:
         if len(organism_ids) != len(genome_paths):
             raise ValueError("Number of organism IDs must match number of genome paths")
         
+        # Determine number of processes (default to number of CPU cores)
+        if n_processes is None:
+            n_processes = os.cpu_count()
+        n_processes = max(1, min(n_processes, len(genome_paths)))
+        
+        print(f"Processing {len(genome_paths)} genomes using {n_processes} processes")
+        
+        # Prepare arguments for parallel processing
+        process_args = [(genome_paths[i], organism_ids[i], k_values) 
+                        for i in range(len(genome_paths))]
+        
         processed_ids = []
+        errors = []
         
-        # Process each genome
-        for i, fasta_path in enumerate(genome_paths):
-            org_id = organism_ids[i]
-            print(f"Processing genome {org_id} ({i+1}/{len(genome_paths)})")
+        # Use ProcessPoolExecutor for parallel processing
+        start_time = time.time()
+        with concurrent.futures.ProcessPoolExecutor(max_workers=n_processes) as executor:
+            future_to_genome = {executor.submit(self._process_single_genome, args): args[1] 
+                                for args in process_args}
             
-            try:
-                # Extract k-mers for this genome
-                self.extract_kmers_from_fasta(fasta_path, k_values, org_id)
-                processed_ids.append(org_id)
-                print(f"Completed {org_id}")
-            except Exception as e:
-                print(f"Error processing {org_id}: {str(e)}")
+            # Process results as they complete
+            completed = 0
+            for future in concurrent.futures.as_completed(future_to_genome):
+                completed += 1
+                org_id, success, error = future.result()
+                
+                # Report progress
+                elapsed = time.time() - start_time
+                genomes_per_sec = completed / elapsed if elapsed > 0 else 0
+                remaining = (len(genome_paths) - completed) / genomes_per_sec if genomes_per_sec > 0 else 0
+                
+                print(f"[{completed}/{len(genome_paths)}] Processed {org_id} - " 
+                        f"{'Success' if success else 'Failed'} "
+                        f"({genomes_per_sec:.2f} genomes/sec, ~{remaining:.1f}s remaining)")
+                
+                if success:
+                    processed_ids.append(org_id)
+                else:
+                    errors.append((org_id, error))
         
-        print(f"Completed processing {len(processed_ids)} out of {len(genome_paths)} genomes")
+        # Print summary
+        print(f"\nCompleted processing {len(processed_ids)} out of {len(genome_paths)} genomes")
+        if errors:
+            print(f"Encountered {len(errors)} errors:")
+            for org_id, error in errors:
+                print(f"  - {org_id}: {error}")
+        
         return processed_ids

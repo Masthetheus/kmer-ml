@@ -1,6 +1,7 @@
 import argparse
 import sys
 from pathlib import Path
+import os
 from kmerml.kmers.generate import KmerExtractor
 from kmerml.utils.path_utils import find_files
 
@@ -8,7 +9,7 @@ def main():
     parser = argparse.ArgumentParser(description="Extract k-mers from genome files")
     
     # Input options
-    parser.add_argument("--input", "-i", required=True, 
+    parser.add_argument("--input", "-i", default="data/raw/", 
                        help="Input directory or file(s) with genome sequences")
     parser.add_argument("--pattern", "-p", default="*.fa,*.fasta",
                        help="Comma-separated patterns to match genome files")
@@ -26,6 +27,8 @@ def main():
     # Processing options
     parser.add_argument("--recursive", "-r", action="store_true",
                        help="Search input directory recursively")
+    parser.add_argument("--processes", "-j", type=int, default=None,
+                       help="Number of parallel processes to use (default: number of CPU cores)")
     
     args = parser.parse_args()
     
@@ -54,11 +57,38 @@ def main():
     # Initialize extractor
     extractor = KmerExtractor(output_dir=args.output_dir, compress=args.compress)
     
-    # Process files
-    for i, genome in enumerate(genome_files):
-        organism_id = genome.stem
-        print(f"Processing {organism_id} ({i+1}/{len(genome_files)})")
-        extractor.extract_kmers_from_fasta(genome, k_values, organism_id=organism_id)
+    # Determine number of processes
+    n_processes = args.processes
+    if n_processes is None:
+        n_processes = os.cpu_count()
+        print(f"Using {n_processes} CPU cores for parallel processing")
+    else:
+        print(f"Using {n_processes} processes as specified")
+    
+    # Extract organism IDs from filenames
+    organism_ids = [genome.stem for genome in genome_files]
+    
+    # Process files in parallel
+    if n_processes > 1 and len(genome_files) > 1:
+        print(f"Processing {len(genome_files)} genomes in parallel")
+        processed_ids = extractor.extract_from_genome_list(
+            genome_files, 
+            k_values, 
+            organism_ids=organism_ids,
+            n_processes=n_processes
+        )
+        print(f"Successfully processed {len(processed_ids)} out of {len(genome_files)} genomes")
+    else:
+        # Fall back to sequential processing for single file or if parallel disabled
+        print("Processing genomes sequentially")
+        for i, genome in enumerate(genome_files):
+            organism_id = organism_ids[i]
+            print(f"Processing {organism_id} ({i+1}/{len(genome_files)})")
+            try:
+                extractor.extract_kmers_from_fasta(genome, k_values, organism_id=organism_id)
+                print(f"Completed {organism_id}")
+            except Exception as e:
+                print(f"Error processing {organism_id}: {str(e)}")
     
     print("K-mer extraction completed successfully")
     return 0
