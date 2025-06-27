@@ -12,3 +12,5 @@ __pycache__/
 dist/
 build/
 *.json
+data/mmap_features/*
+data/results/*

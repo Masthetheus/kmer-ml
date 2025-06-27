@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import pandas as pd
 
 def find_files(directory, patterns=None, recursive=False):
     """
@@ -58,3 +59,19 @@ def is_valid_file(file_path):
     """
     path = Path(file_path)
     return path.exists() and path.is_file() and os.access(path, os.R_OK)
+
+def get_accession_codes_from_tsv(tsv_path, accession_column="Assembly Accession"):
+    """
+    Reads a TSV file and returns a list of accession codes from the specified column,
+    converting dots to underscores (e.g., GCF_035610405.1 -> GCF_035610405_1).
+
+    Args:
+        tsv_path (str or Path): Path to the TSV file.
+        accession_column (str): Name of the column containing accession codes.
+
+    Returns:
+        list: List of accession codes as strings with dots replaced by underscores.
+    """
+    df = pd.read_csv(tsv_path, sep="\t")
+    # Replace dots with underscores in accession codes
+    return df[accession_column].dropna().astype(str).str.replace('.', '_', regex=False).tolist()

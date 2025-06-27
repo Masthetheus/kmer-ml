@@ -1,10 +1,10 @@
-from pathlib import Path
 import pandas as pd
 import numpy as np
-import math
-from collections import defaultdict
 import time
+from pathlib import Path
+from collections import defaultdict
 from kmerml.utils.progress import progress_bar
+import gzip
 
 class KmerFeatureExtractor:
     """Extract machine learning features from k-mer data"""
@@ -46,8 +46,11 @@ class KmerFeatureExtractor:
         # Define default features if not specified
         if required_features is None:
             required_features = [
-                'base_counts', 'gc_content', 'cpg_sites', 
-                'entropy', 'repeats', 'presence'
+                'relative_freq', 'gc_percent', 'gc_skew', 'at_skew',
+                'shannon_entropy', 'normalized_entropy',
+                'is_palindrome', 'noncanonical',
+                'unique_kmer_ratio', 'repeated_kmer_ratio',
+                'palindrome_ratio', 'noncanonical_ratio'
             ]
         
         # Group files by organism
@@ -96,148 +99,124 @@ class KmerFeatureExtractor:
         """Process all k-mer files for an organism"""
         # Get genome metadata if available
         genome_size = None
-        
+    
         if hasattr(self, 'metadata_manager'):
             genome_size = self.metadata_manager.get_genome_size(organism)
-        
+    
         # Process each k-mer file
         all_features = []
-
+    
         # For the progress bar
         kmertot = len(kmer_files)
         cont = 0
         start = time.time()
-
+    
         for kmer_file in kmer_files:
             # Extract k value
             k_val = self._extract_k_from_filename(kmer_file.name)
             if k_val is None:
                 print(f"Warning: Could not extract k value from {kmer_file}")
                 continue
-            
+    
             # Load the file
             df = self._load_kmer_file(kmer_file)
-            
+    
             # Process each k-mer
             file_features = self._extract_kmer_features(
-                df, k_val, organism, required_features
+                df, k_val, organism=organism, required_features=required_features
             )
-            all_features.extend(file_features)
-
+            if file_features is not None:
+                all_features.extend(file_features)
+    
             cont += 1
             start = progress_bar(cont, kmertot, start_time=start, title="K values processed")
-            
-        
+    
         # Create DataFrame
         if not all_features:
             print(f"No features extracted for {organism}")
             return None
-        
+    
         result_df = pd.DataFrame(all_features)
-        
-        # Add genome metadata
-        if genome_size:
-            result_df['genome_size'] = genome_size
-        
+    
         # Save to CSV
         output_file = self.output_dir / f"{organism}_kmer_features.csv"
         result_df.to_csv(output_file, index=False)
         print(f"Created feature CSV for {organism}: {output_file}")
-        
+    
         return output_file
     
-    def _extract_kmer_features(self, df, k_val, organism, required_features):
-        """Extract features for each k-mer in DataFrame"""
+    def _extract_kmer_features(self, df, k_val,organism=None, required_features=None):
+        """
+        Extract features from k-mer DataFrame.
+        Features: relative frequency, GC%, skew, entropy, palindromes, non-canonical.
+        Global features: proportion of palindromes, unique, repeated, non-canonical.
+        """
         features_list = []
-        
-        for _, row in df.iterrows():
-            kmer_encoded = row['kmer']
-            count = row['count']
-            
-            # Decode k-mer if necessary
-            kmer = self._decode_kmer(kmer_encoded) if str(kmer_encoded).isdigit() else kmer_encoded
-            
-            # Basic features (always included)
+        kmers = df['kmer'].values
+        counts = df['count'].values
+        total_kmers = counts.sum()
+    
+        # Pre compute masks for unique and repeated k-mers
+        unique_mask = counts == 1
+        repeated_mask = counts > 1
+    
+        # Global features
+        unique_ratio = unique_mask.sum() / len(counts) if len(counts) > 0 else 0
+        repeated_ratio = repeated_mask.sum() / len(counts) if len(counts) > 0 else 0
+
+        # Optmized function to check if a k-mer is a palindrome
+        def is_palindrome_kmer(kmer):
+            complement = {'A':'T', 'T':'A', 'C':'G', 'G':'C'}
+            k = len(kmer)
+            for i in range(k // 2):
+                if kmer[i] != complement.get(kmer[-(i+1)], kmer[-(i+1)]):
+                    return 0
+            return 1
+
+        # Process each k-mer
+        for i in range(len(kmers)):
+            kmer = kmers[i]
+            count = counts[i]
             kmer_features = {
                 'kmer': kmer,
                 'count': count,
-                'k': k_val
+                'k': k_val,
+                'relative_freq': count / total_kmers if total_kmers > 0 else 0
             }
-            
-            # Add additional requested features
-            if 'gc_content' in required_features:
-                self._add_gc_features(kmer_features, kmer)
-                
-            if 'base_counts' in required_features:
-                self._add_base_count_features(kmer_features, kmer)
-                
-            if 'presence' in required_features:
-                self._add_presence_features(kmer_features, kmer)
-                
-            if 'cpg_sites' in required_features:
-                self._add_cpg_features(kmer_features, kmer)
-                
-            if 'entropy' in required_features:
-                self._add_entropy_features(kmer_features, kmer)
-                
-            if 'repeats' in required_features:
-                self._add_repeat_features(kmer_features, kmer)
-            
+            # Skew
+            g = kmer.count('G')
+            c = kmer.count('C')
+            a = kmer.count('A')
+            t = kmer.count('T')
+            kmer_features['gc_skew'] = (g - c) / (g + c) if (g + c) > 0 else 0
+            kmer_features['at_skew'] = (a - t) / (a + t) if (a + t) > 0 else 0
+            # GC%
+            gc = g+c
+            kmer_features['gc_percent'] = (gc / len(kmer)) * 100 if len(kmer) > 0 else 0
+            # Entropia de Shannon
+            bases = np.array([a, c, g, t])
+            probs = bases / len(kmer)
+            entropy = -np.sum([p * np.log2(p) for p in probs if p > 0])
+            kmer_features['shannon_entropy'] = entropy
+            kmer_features['normalized_entropy'] = entropy / 2.0  # máximo para DNA
+            # Palindromes
+            kmer_features['is_palindrome'] = is_palindrome_kmer(kmer)
+            # Non canonical
+            kmer_features['noncanonical'] = int(any(base not in 'ACGT' for base in kmer))
             features_list.append(kmer_features)
-            
+    
+        # Global features
+        for f in features_list:
+            f['unique_kmer_ratio'] = unique_ratio
+            f['repeated_kmer_ratio'] = repeated_ratio
+        # Palindrome and non-canonical ratios
+        palindrome_ratio = sum(f['is_palindrome'] for f in features_list) / len(features_list) if features_list else 0
+        noncanonical_ratio = sum(f['noncanonical'] for f in features_list) / len(features_list) if features_list else 0
+        for f in features_list:
+            f['palindrome_ratio'] = palindrome_ratio
+            f['noncanonical_ratio'] = noncanonical_ratio
+    
         return features_list
-    
-    def _add_gc_features(self, features_dict, kmer):
-        """Add GC content related features"""
-        gc_count = kmer.count('G') + kmer.count('C')
-        features_dict['gc_percent'] = (gc_count / len(kmer)) * 100 if len(kmer) > 0 else 0
-    
-    def _add_base_count_features(self, features_dict, kmer):
-        """Add base count features"""
-        for base in 'ACGT':
-            features_dict[f'{base}_count'] = kmer.count(base)
-    
-    def _add_presence_features(self, features_dict, kmer):
-        """Add binary presence features"""
-        for base in 'ACGT':
-            features_dict[f'{base}_present'] = 1 if base in kmer else 0
-    
-    def _add_cpg_features(self, features_dict, kmer):
-        """Add CpG site features"""
-        # Count CpG dinucleotides
-        cpg_count = sum(1 for i in range(len(kmer)-1) if kmer[i:i+2] == 'CG')
-        features_dict['cpg_count'] = cpg_count
-        
-        # Calculate CpG observed/expected ratio
-        c_freq = kmer.count('C') / len(kmer) if len(kmer) > 0 else 0
-        g_freq = kmer.count('G') / len(kmer) if len(kmer) > 0 else 0
-        expected = c_freq * g_freq * (len(kmer) - 1) if c_freq * g_freq > 0 else 0.001
-        features_dict['cpg_obs_exp'] = cpg_count / expected if expected > 0 else 0
-    
-    def _add_entropy_features(self, features_dict, kmer):
-        """Add sequence complexity/entropy features"""
-        # Shannon entropy
-        base_counts = {base: kmer.count(base) for base in set(kmer)}
-        entropy = 0
-        for base, count in base_counts.items():
-            prob = count / len(kmer)
-            entropy -= prob * math.log2(prob) if prob > 0 else 0
-        features_dict['shannon_entropy'] = entropy
-        
-        # Normalize by max possible entropy (2 for DNA)
-        features_dict['normalized_entropy'] = entropy / 2.0
-    
-    def _add_repeat_features(self, features_dict, kmer):
-        """Add repeat sequence features"""
-        # Detect simple repeats
-        features_dict['has_repeat'] = 0
-        
-        # Look for dinucleotide repeats
-        for i in range(len(kmer)-3):
-            di = kmer[i:i+2]
-            if di == kmer[i+2:i+4]:
-                features_dict['has_repeat'] = 1
-                break
     
     def _extract_k_from_filename(self, filename):
         """Extract k value from filename like 'k8.txt'"""
@@ -251,23 +230,28 @@ class KmerFeatureExtractor:
         return ''.join(encoding_map.get(c, 'N') for c in str(encoded_kmer))
     
     def _load_kmer_file(self, filepath):
-        """Load a k-mer file into a pandas DataFrame"""
+        """Load a k-mer file using direct line parsing"""
+        
         # Check if file is gzipped
         is_gzipped = str(filepath).endswith('.gz')
-        compression = 'gzip' if is_gzipped else None
+        open_func = gzip.open if is_gzipped else open
+        mode = 'rt' if is_gzipped else 'r'
         
-        try:
-            # Try to load with header
-            df = pd.read_csv(filepath, sep='\t', compression=compression)
-            
-            # Check if the file actually has headers
-            if 'kmer' not in df.columns and 'count' not in df.columns:
-                # Try again without header
-                df = pd.read_csv(filepath, sep='\t', header=None, 
-                                names=['kmer', 'count'], compression=compression)
-        except:
-            # Fallback: load without header
-            df = pd.read_csv(filepath, sep='\t', header=None, 
-                            names=['kmer', 'count'], compression=compression)
+        kmers = []
+        counts = []
         
-        return df
+        with open_func(filepath, mode) as f:
+            for line in f:
+                # Split on any whitespace (tab or space)
+                parts = line.strip().split()
+                if len(parts) == 2:
+                    kmer, count = parts
+                    kmer = self._decode_kmer(kmer)
+                    kmers.append(kmer)
+                    try:
+                        counts.append(int(count))
+                    except ValueError:
+                        print(f"Warning: Non-integer count in {filepath}: {count}")
+                        counts.append(0)
+        
+        return pd.DataFrame({'kmer': kmers, 'count': counts})

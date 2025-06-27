@@ -4,6 +4,7 @@ from pathlib import Path
 import os
 from kmerml.kmers.generate import KmerExtractor
 from kmerml.utils.path_utils import find_files
+from kmerml.utils.path_utils import get_accession_codes_from_tsv
 
 def main():
     parser = argparse.ArgumentParser(description="Extract k-mers from genome files")
@@ -30,6 +31,10 @@ def main():
     parser.add_argument("--processes", "-j", type=int, default=None,
                        help="Number of parallel processes to use (default: number of CPU cores)")
     
+    parser.add_argument("--accession-tsv", type=str, default=None,
+                    help="TSV file with accession codes to filter genomes")
+
+    
     args = parser.parse_args()
     
     # Parse k values
@@ -42,12 +47,26 @@ def main():
     # Find input files
     patterns = args.pattern.split(",")
     input_path = Path(args.input)
-    
+        
     if input_path.is_file():
         genome_files = [input_path]
     else:
         genome_files = find_files(args.input, patterns=patterns, recursive=args.recursive)
-    
+
+    if args.accession_tsv:
+        accessions = set(get_accession_codes_from_tsv(args.accession_tsv))
+        # Accept both with and without version
+        def file_matches_accession(genome):
+            stem = genome.stem
+            # Try exact match
+            if stem in accessions:
+                return True
+            # Try without version (e.g., GCF_000005845.2 -> GCF_000005845)
+            if "." in stem and stem.split(".")[0] in accessions:
+                return True
+            return False
+        genome_files = [g for g in genome_files if file_matches_accession(g)]
+
     if not genome_files:
         print(f"No genome files found matching patterns: {args.pattern}")
         return 1

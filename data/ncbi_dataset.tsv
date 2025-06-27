@@ -1,3 +1,65 @@
 Assembly Accession	Assembly Name	Organism Name	Organism Infraspecific Names Breed	Organism Infraspecific Names Strain	Organism Infraspecific Names Cultivar	Organism Infraspecific Names Ecotype	Organism Infraspecific Names Isolate	Organism Infraspecific Names Sex	Annotation Name	Assembly Level	Assembly Release Date	WGS project accession	Assembly Stats Number of Scaffolds
-GCF_003013715.1	ASM301371v2	Candidozyma auris		B11220					Annotation submitted by Centers for Disease Control and Prevention	Complete Genome	2019-09-10		7
-GCF_000146045.2													
+GCF_000009045.1	ASM904v1	Bacillus subtilis subsp. subtilis str. 168		168					Annotation submitted by NCBI RefSeq	Complete Genome	2009-08-12		1
+GCF_004799605.1	ASM479960v1	Halobacterium salinarum		91-R6					GCF_004799605.1-RS_2024_10_23	Complete Genome	2019-04-18		3
+GCF_002945325.1	ASM294532v1	Methanococcus maripaludis		DSM 2067					GCF_002945325.1-RS_2024_10_22	Complete Genome	2018-02-12		1
+GCF_000005845.2	ASM584v2	Escherichia coli str. K-12 substr. MG1655		K-12 substr. MG1655					Annotation submitted by NCBI RefSeq	Complete Genome	2013-11-03		1
+GCF_000008865.2	ASM886v2	Escherichia coli O157:H7 str. Sakai		Sakai substr. RIMD 0509952					Annotation submitted by NCBI RefSeq	Complete Genome	2018-06-08		3
+GCF_034140825.1	AGIS1.0	Oryza sativa Japonica Group							GCF_034140825.1-RS_2024_06	Complete Genome	2023-12-06		12
+GCF_000013425.1	ASM1342v1	Staphylococcus aureus subsp. aureus NCTC 8325		NCTC 8325					Annotation submitted by NCBI RefSeq	Complete Genome	2006-02-18		1
+GCF_000002765.6	GCA_000002765	Plasmodium falciparum 3D7					3D7		Annotation submitted by Plasmodium falciparum Genome Sequencing Consortium	Complete Genome	2016-04-07		14
+GCA_008728235.1	ASM872823v1	Lichtheimia ramosa		KPH11						Complete Genome	2019-09-30		10
+GCF_000025685.1	ASM2568v1	Haloferax volcanii DS2		DS2					GCF_000025685.1-RS_2024_10_21	Complete Genome	2010-03-23		5
+GCF_004799605.1	ASM479960v1	Halobacterium salinarum		91-R6					GCF_004799605.1-RS_2024_10_23	Complete Genome	2019-04-18		3
+GCF_002945325.1	ASM294532v1	Methanococcus maripaludis		DSM 2067					GCF_002945325.1-RS_2024_10_22	Complete Genome	2018-02-12		1
+GCF_000012285.1	ASM1228v1	Sulfolobus acidocaldarius DSM 639		DSM 639					GCF_000012285.1-RS_2025_03_29	Complete Genome	2005-07-08		1
+GCF_000007345.1	ASM734v1	Methanosarcina acetivorans C2A		C2A					GCF_000007345.1-RS_2024_10_21	Complete Genome	2002-04-09		1
+GCF_000016525.1	ASM1652v1	Methanobrevibacter smithii ATCC 35061		ATCC 35061; PS; DSMZ 861					GCF_000016525.1-RS_2024_10_21	Complete Genome	2007-06-04		1
+GCF_000970205.1	ASM97020v1	Methanosarcina mazei S-6		S-6					GCF_000970205.1-RS_2024_10_21	Complete Genome	2015-04-07		1
+GCF_000009965.1	ASM996v1	Thermococcus kodakarensis KOD1		KOD1					GCF_000009965.1-RS_2024_10_21	Complete Genome	2005-01-13		1
+GCF_008245085.1	ASM824508v1	Pyrococcus furiosus DSM 3638		DSM 3638					GCF_008245085.1-RS_2024_10_23	Complete Genome	2019-09-03		1
+GCF_000223905.1	ASM22390v1	Haloarcula hispanica ATCC 33960		CGMCC 1.2049					GCF_000223905.1-RS_2024_10_21	Complete Genome	2011-08-17		3
+GCF_000970025.1	ASM97002v1	Methanosarcina barkeri MS		MS					GCF_000970025.1-RS_2024_10_21	Complete Genome	2015-04-07		2
+GCF_000016605.1	ASM1660v1	Metallosphaera sedula DSM 5348		DSM 5348					GCF_000016605.1-RS_2024_11_18	Complete Genome	2007-04-25		1
+GCF_005406325.1	ASM540632v1	Haloferax mediterranei ATCC 33500		ATCC 33500					GCF_005406325.1-RS_2024_10_23	Complete Genome	2019-05-16		4
+GCF_000304355.2	Mb_MS2	Methanoculleus bourgensis MS2		type strain:MS2					GCF_000304355.2-RS_2024_10_21	Complete Genome	2014-02-04		1
+GCF_000195915.1	ASM19591v1	Thermoplasma acidophilum DSM 1728		DSM 1728					GCF_000195915.1-RS_2024_10_21	Complete Genome	2003-05-06		1
+GCF_000172995.2	ASM17299v2	Halogeometricum borinquense DSM 11551		DSM 11551					GCF_000172995.2-RS_2024_10_21	Complete Genome	2010-11-22		6
+GCF_000022205.1	ASM2220v1	Halorubrum lacusprofundi ATCC 49239		ATCC 49239					GCF_000022205.1-RS_2025_04_07	Complete Genome	2009-02-04		3
+GCF_027554905.1	ASM2755490v1	Methanothermobacter thermautotrophicus		Delta H					GCF_027554905.1-RS_2024_12_13	Complete Genome	2023-01-03		1
+GCF_000196895.1	ASM19689v1	Halalkalicoccus jeotgali B3		B3					GCF_000196895.1-RS_2024_10_21	Complete Genome	2010-06-23		7
+GCF_000698785.1	ASM69878v1	Nitrososphaera viennensis EN76		EN76					GCF_000698785.1-RS_2024_12_16	Complete Genome	2014-06-06		1
+GCF_000091665.1	ASM9166v1	Methanocaldococcus jannaschii DSM 2661		DSM 2661					GCF_000091665.1-RS_2024_10_21	Complete Genome	1999-12-22		3
+GCF_000018465.1	ASM1846v1	Nitrosopumilus maritimus SCM1		SCM1					GCF_000018465.1-RS_2025_03_29	Complete Genome	2007-11-15		1
+GCF_000007225.1	ASM722v1	Pyrobaculum aerophilum str. IM2		IM2					GCF_000007225.1-RS_2024_12_16	Complete Genome	2002-01-24		1
+GCF_033473495.1	ASM3347349v1	Cercospora beticola					Cb09-40		Annotation submitted by USDA-ARS	Complete Genome	2023-11-09		10
+GCA_048569275.1	ASM4856927v1	Talaromyces purpureogenus					PV59			Complete Genome	2025-03-13	JBLFET01	8
+GCA_025854295.1	ASM2585429v1	Lyophyllum decastes		LRG-d1-1						Complete Genome	2022-10-26		15
+GCF_000836335.1	ASM83633v2	Cryptococcus bacillisporus CA1280		CA1280					Annotation submitted by Department of Molecular Genetics and Microbiology, Duke University	Complete Genome	2024-07-31		14
+GCA_040126005.1	TJAS01	Annulohypoxylon stygium		TJAS01						Complete Genome	2024-06-11		10
+GCA_024499215.1	ASM2449921v1	Cercospora sojina		CCC 172-09/ARG_09_172						Complete Genome	2022-08-01		12
+GCA_035575875.1	ASM3557587v1	Babesia gibsoni		WH58						Complete Genome	2024-01-10		4
+GCA_039634465.1	ASM3963446v1	Didymella pinodella		HNA18						Complete Genome	2024-05-14		15
+GCA_008274985.1	ASM827498v1	Aspergillus sojae		SMF134						Complete Genome	2019-09-05		8
+GCA_034359265.1	ASM3435926v1	Canna indica							Annotation submitted by Guizhou University	Complete Genome	2023-12-13		9
+GCA_046470805.1	ASM4647080v1	Citrus x aurantium					ZGSC			Complete Genome	2025-01-06	JBKFCI01	9
+GCA_041412015.1	ASM4141201v1	Pestalotiopsis microspora		KFRD-2						Complete Genome	2024-08-23	JBFTYK01	7
+GCA_036768465.1	ASM3676846v1	Alternaria brassicae		PNT						Complete Genome	2024-02-22		10
+GCA_964275055.1	MOSE0	Monosporozyma servazzii							Annotation submitted by Genoscope CEA, 2 rue Gaston Cremieux CP5706 91057 Evry cedex, France, France	Complete Genome	2024-10-10		14
+GCA_024072835.1	ASM2407283v1	Epichloe amarillans		NFE708						Complete Genome	2022-06-30		7
+GCA_050084535.1	PCAv2.0	Prunus campanulata			Lianmeiren				Annotation submitted by Zhejiang Academy of Forestry	Complete Genome	2025-05-01	JBKKFS01	8
+GCA_009938135.1	ASM993813v1	Malassezia furfur					CBS14141		Annotation submitted by Jawaharlal Nehru Centre for Advanced Scientific Research	Complete Genome	2020-01-28		7
+GCF_036810445.1	ASM3681044v1	Kwoniella europaea PYCC6329		PYCC6329					Annotation submitted by Department of Molecular Genetics and Microbiology, Duke University	Complete Genome	2024-07-02		3
+GCF_000226115.1	ASM22611v1	Thermothielavioides terrestris NRRL 8126		NRRL 8126					Annotation submitted by DOE Joint Genome Institute	Complete Genome	2011-09-16		6
+GCF_013368755.1	ASM1336875v1	Talaromyces rugulosus		W13939					Annotation submitted by Xi'an Jiaotong University	Complete Genome	2020-06-23		6
+GCF_020906515.1	ASM2090651v1	Vanrija pseudolonga					DUCC4014		Annotation submitted by Dankook University	Complete Genome	2021-11-21		8
+GCF_013402915.1	ASM1340291v1	Zygotorulaspora mrakii		NRRL Y-6702					Annotation submitted by University College Dublin	Complete Genome	2020-07-12		8
+GCF_036630325.1	ASM3663032v1	Vairimorpha necatrix					Illinois isolate		Annotation submitted by Molecular Biology, Umea University	Complete Genome	2024-05-23		12
+GCA_038396805.1	Version 1	Chloropicon roscoffensis		RCC1871					Annotation submitted by Biochimie, microbiologie et bio-informatique, Universite Laval	Complete Genome	2024-04-20		19
+GCA_964275045.1	MOUN0	Monosporozyma unispora							Annotation submitted by Genoscope	Complete Genome	2024-10-10		15
+GCA_040250155.1	Pf_T2	Penicillium fuscoglaucum					Pf_T2			Complete Genome	2024-06-19		5
+GCA_023658535.1	ASM2365853v1	Epichloe glyceriae		E2772						Complete Genome	2022-06-07		7
+GCA_041721605.1	FAFU-Ppen-JC-1-v1.0	Pyricularia penniseti		JC-1						Complete Genome	2024-09-03	JBGNXE01	10
+GCA_026210745.1	ASM2621074v1	Exobasidium rhododendri		CBS101457					Annotation submitted by Hebei University	Complete Genome	2022-11-16		3
+GCA_045529695.1	ASM4552969v1	Blastobotrys allociferrii		CBS 18616						Complete Genome	2024-12-06	JBFYDE01	4
+GCA_917563905.1	NneoKNNDK_001_PacBio_v1	Neonectria neomacrospora					KNNDK1			Complete Genome	2021-10-15		12
+GCF_035610405.1	ASM3561040v1	Australozyma saopauloensis		19XY460					Annotation submitted by Peking Union Medical College Hospital	Complete Genome	2024-01-12		8
