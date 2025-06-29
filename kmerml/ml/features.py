@@ -46,10 +46,8 @@ class KmerFeatureBuilderAgg:
             DataFrame with organisms as rows and aggregated features as columns
         """
         if metrics is None:
-            metrics = ['relative_freq', 'gc_percent', 'gc_skew', 'at_skew',
-                'shannon_entropy', 'normalized_entropy',
-                'is_palindrome', 'noncanonical',
-                'unique_kmer_ratio', 'repeated_kmer_ratio',
+            metrics = ['relative_freq', 'gc_skew', 'at_skew',
+                'shannon_entropy', 'is_palindrome', 'unique_kmer_ratio',
                 'palindrome_ratio', 'noncanonical_ratio']
         if agg_funcs is None:
             agg_funcs = ["mean", "std", "min", "max"]

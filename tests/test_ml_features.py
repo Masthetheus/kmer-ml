@@ -13,7 +13,7 @@ import fastcluster
 stats_dir = "data/processed/features"
 builder = KmerFeatureBuilderAgg(stats_dir=stats_dir)
 feature_matrix = builder.build_aggregated_features(
-    metrics=['gc_percent', 'gc_skew', 'unique_kmer_ratio'],
+    metrics=['gc_percent', 'gc_skew', 'unique_kmer_ratio','palindrome_ratio', 'normalized_entropy'],
     agg_funcs=['mean'],
     n_jobs=20
 )
@@ -21,34 +21,34 @@ feature_matrix_std = builder.standardize_features()
 
 print("Initializing dimensionality reduction...")
 # Redução de dimensionalidade
-X_pca = reduce_dimensions(feature_matrix_std, method="pca", n_components=2)
+X_pca = reduce_dimensions(feature_matrix_std, method="pca", n_components=5)
 plot_reduced(X_pca, labels=None, title="PCA - Organismos")
 
 from sklearn.metrics import silhouette_score
 from sklearn.cluster import KMeans
 
-# inertias = []
-# silhouette_scores = []
-# K_range = range(2, 10)
-# for k in K_range:
-#     kmeans = KMeans(n_clusters=k, random_state=42).fit(X_pca)
-#     inertias.append(kmeans.inertia_)
-#     labels = kmeans.labels_
-#     silhouette_scores.append(silhouette_score(X_pca, labels))
+inertias = []
+silhouette_scores = []
+K_range = range(2, 10)
+for k in K_range:
+    kmeans = KMeans(n_clusters=k, random_state=42).fit(X_pca)
+    inertias.append(kmeans.inertia_)
+    labels = kmeans.labels_
+    silhouette_scores.append(silhouette_score(X_pca, labels))
 
-# plt.figure()
-# plt.plot(K_range, inertias, marker='o')
-# plt.xlabel("n_clusters")
-# plt.ylabel("Inertia")
-# plt.title("Elbow Method for KMeans")
-# plt.show()
+plt.figure()
+plt.plot(K_range, inertias, marker='o')
+plt.xlabel("n_clusters")
+plt.ylabel("Inertia")
+plt.title("Elbow Method for KMeans")
+plt.show()
 
-# plt.figure()
-# plt.plot(K_range, silhouette_scores, marker='o')
-# plt.xlabel("n_clusters")
-# plt.ylabel("Silhouette Score")
-# plt.title("Silhouette Score for KMeans")
-# plt.show()
+plt.figure()
+plt.plot(K_range, silhouette_scores, marker='o')
+plt.xlabel("n_clusters")
+plt.ylabel("Silhouette Score")
+plt.title("Silhouette Score for KMeans")
+plt.show()
 
 from sklearn.neighbors import NearestNeighbors
 
@@ -82,12 +82,37 @@ plt.show()
 X_umap = reduce_dimensions(feature_matrix_std, method="umap", n_components=2)
 plot_reduced(X_umap, labels=None, title="UMAP - Organismos")
 
+kmeans = KMeans(n_clusters=4, random_state=42)
+clusters_kmeans_umap = KMeans(n_clusters=4, random_state=42).fit_predict(X_umap)
+plt.scatter(X_umap[:,0], X_umap[:,1], c=clusters_kmeans_umap, cmap='tab10')
+plt.figure()
+plt.title("UMAP - KMeans Clusters")
+plt.xlabel("UMAP 1")
+plt.ylabel("UMAP 2")
+plt.show()
+from sklearn.cluster import DBSCAN
+# Exemplo com clusters do DBSCAN:
+dbscan = DBSCAN(eps=4, min_samples=5)
+clusters_dbscan = dbscan.fit_predict(X_umap)
+plt.figure()
+plt.scatter(X_umap[:,0], X_umap[:,1], c=clusters_dbscan, cmap='tab10')
+plt.title("UMAP - DBSCAN Clusters")
+plt.xlabel("UMAP 1")
+plt.ylabel("UMAP 2")
+plt.show()
+
 from sklearn.cluster import KMeans
 kmeans = KMeans(n_clusters=4, random_state=42)
 clusters = kmeans.fit_predict(X_pca)  # Use PCA-reduced data
+plt.scatter(X_pca[:,0], X_pca[:,1], c=clusters, cmap='tab10')
+plt.title("KMeans Clustering")
+plt.show()
 from sklearn.cluster import DBSCAN
 dbscan = DBSCAN(eps=4, min_samples=5)
-clusters = dbscan.fit_predict(X_pca)
+clusters_dbscan = dbscan.fit_predict(X_pca)
+plt.scatter(X_pca[:,0], X_pca[:,1], c=clusters_dbscan, cmap='tab10')
+plt.title("DBSCAN Clustering")
+plt.show()
 from sklearn.mixture import GaussianMixture
 gmm = GaussianMixture(n_components=4, random_state=42)
 clusters = gmm.fit_predict(X_pca)

@@ -46,11 +46,9 @@ class KmerFeatureExtractor:
         # Define default features if not specified
         if required_features is None:
             required_features = [
-                'relative_freq', 'gc_percent', 'gc_skew', 'at_skew',
+                'relative_freq', 'gc_skew', 'at_skew',
                 'shannon_entropy', 'normalized_entropy',
-                'is_palindrome', 'noncanonical',
-                'unique_kmer_ratio', 'repeated_kmer_ratio',
-                'palindrome_ratio', 'noncanonical_ratio'
+                'is_palindrome'
             ]
         
         # Group files by organism
