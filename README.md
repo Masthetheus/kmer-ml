@@ -49,10 +49,12 @@ This project is being developed as part of a Master's course subject and is curr
 **Current development focus:**
 - ✅ Genome download from NCBI via Entrez API Script
 - ✅ K-mer generation and processing
-- 🔄 Machine learning pipeline
-- ❌ Visualization tools
-- ❌ Analysis tools
-- ❌ Final panoram
+- ✅ Machine learning pipeline implementation
+- ✅ Clustering and dimensionality reduction
+- 🔄 Visualization tools
+- 🔄 Advanced phylogenetic analysis
+- ❌ Command-line interface
+- ❌ Documentation and tutorials
   
 Legend: ✅ Implemented | 🔄 In progress | ❌ Planned
 
@@ -111,6 +113,30 @@ python -m scripts.download_genomes --accession-list data/accession_list.txt
 python -m scripts.download_genomes
 ```
 3. The genomes related to given access files will then be downloaded to data/raw/ and automatically processed (converted to all uppercase).
+
+### 2. K-mer analysis and machine learning
+
+After generating k-mer statistics files, you can perform clustering analysis:
+
+```python
+from kmerml.ml import cluster_organisms
+
+# Perform complete clustering workflow
+results = cluster_organisms(
+    stats_dir="data/processed/features",
+    metrics=['shannon_entropy', 'gc_percent', 'relative_freq'],
+    agg_funcs=['mean', 'std'],
+    dim_reduction="umap",
+    clustering="hierarchical",
+    n_clusters=3,
+    output_dir="data/results/clustering"
+)
+
+# Access results
+feature_matrix = results['feature_matrix']
+clustering_labels = results['clustering_results']['labels']
+plots = results['plots']
+```
 ---
 
 ## Project Structure

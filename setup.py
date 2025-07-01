@@ -35,10 +35,15 @@ setup(
     install_requires=[
         "biopython>=1.85",
         "requests>=2.32",
-        "beautifulsoup4",
-        "tqdm",
-        "numpy",
-        "pandas",
+        "beautifulsoup4>=4.12",
+        "tqdm>=4.65",
+        "numpy>=1.24",
+        "pandas>=1.5",
+        "scikit-learn>=1.3",
+        "matplotlib>=3.6",
+        "seaborn>=0.12",
+        "scipy>=1.10",
+        "umap-learn>=0.5",
     ],
 
     # Command line scripts
