@@ -143,7 +143,7 @@ class KmerFeatureExtractor:
     
         return output_file
     
-    def _extract_kmer_features(self, df, k_val,organism=None, required_features=None):
+    def _extract_kmer_features(self, df, k_val, required_features=None):
         """
         Extract features from k-mer DataFrame.
         Features: relative frequency, GC%, skew, entropy, palindromes, non-canonical.
@@ -222,11 +222,6 @@ class KmerFeatureExtractor:
         match = re.search(r'k(\d+)', filename)
         return int(match.group(1)) if match else None
     
-    def _decode_kmer(self, encoded_kmer):
-        """Decode a numerically encoded k-mer to ACGT sequence"""
-        encoding_map = {'0': 'A', '1': 'T', '2': 'C', '3': 'G'}
-        return ''.join(encoding_map.get(c, 'N') for c in str(encoded_kmer))
-    
     def _load_kmer_file(self, filepath):
         """Load a k-mer file using direct line parsing"""
         
@@ -244,7 +239,6 @@ class KmerFeatureExtractor:
                 parts = line.strip().split()
                 if len(parts) == 2:
                     kmer, count = parts
-                    kmer = self._decode_kmer(kmer)
                     kmers.append(kmer)
                     try:
                         counts.append(int(count))

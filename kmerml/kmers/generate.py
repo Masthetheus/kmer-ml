@@ -68,10 +68,7 @@ class KmerExtractor:
         return organism_id
     
     def _save_kmers_to_file(self, kmers, organism_id, k):
-        """Save k-mers with numeric encoding in organism-specific folders"""
-        # Define encoding
-        encoding = {'A': 0, 'T': 1, 'C': 2, 'G': 3}
-        
+        """Save k-mers with numeric encoding in organism-specific folders"""        
         # Create organism-specific directory
         organism_dir = self.output_dir / organism_id
         ensure_directory_exists(organism_dir)
@@ -88,9 +85,7 @@ class KmerExtractor:
         
         with open_func(filepath, mode) as f:
             for kmer, count in kmers.items():
-                # Convert k-mer to numeric representation
-                numeric_kmer = ''.join(str(encoding.get(base, 'X')) for base in kmer)
-                f.write(f"{numeric_kmer}\t{count}\n")
+                f.write(f"{kmer}\t{count}\n")
     
     def _process_single_genome(self, args):
         """Helper method for parallel processing of a single genome"""

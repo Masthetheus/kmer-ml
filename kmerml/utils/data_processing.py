@@ -1,7 +1,7 @@
 import pandas as pd
 from Bio import Entrez
 
-def add_phylum_family_to_tsv(tsv_path, output_path, taxid_column="tax_id", email="seu@email.com"):
+def add_phylum_family_to_tsv(tsv_path, output_path, taxid_column="tax_id", email="your@mail.com"):
 
     Entrez.email = email
     df = pd.read_csv(tsv_path, sep="\t")

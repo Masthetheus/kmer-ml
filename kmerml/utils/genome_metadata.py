@@ -1,5 +1,4 @@
 import json
-import os
 from datetime import datetime
 from pathlib import Path
 from Bio import SeqIO
@@ -83,31 +82,6 @@ class GenomeMetadataManager:
         if metadata["total_size"] > 0:
             metadata["gc_content"] = (total_gc / metadata["total_size"]) * 100
         return metadata
-
-
-    def add_phylum_family_to_tsv(tsv_path, output_path, taxid_column="tax_id", email="seu@email.com"):
-        """
-        Lê um TSV com uma coluna tax_id, adiciona colunas 'phylum' e 'family' usando o NCBI, e salva o resultado.
-        """
-        Entrez.email = email
-        df = pd.read_csv(tsv_path, sep="\t")
-        phyla = []
-        families = []
-        for taxid in df[taxid_column]:
-            try:
-                handle = Entrez.efetch(db="taxonomy", id=str(taxid), retmode="xml")
-                records = Entrez.read(handle)
-                lineage = {item['Rank']: item['ScientificName'] for item in records[0]['LineageEx']}
-                phyla.append(lineage.get('phylum', 'NA'))
-                families.append(lineage.get('family', 'NA'))
-            except Exception as e:
-                print(f"Erro ao buscar taxid {taxid}: {e}")
-                phyla.append('NA')
-                families.append('NA')
-        df['phylum'] = phyla
-        df['family'] = families
-        df.to_csv(output_path, sep="\t", index=False)
-        print(f"Arquivo salvo em: {output_path}")
 
     def _fetch_ncbi_metadata(self, accession):
         """Fetch organism name, taxid, and genome length from NCBI for a given accession."""

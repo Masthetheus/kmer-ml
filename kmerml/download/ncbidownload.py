@@ -25,10 +25,10 @@ def read_accession_txt(filepath):
     accessions = set()
     with open(filepath) as f:
         for line in f:
-            acc = line.strip() # Remove espaços em branco
-            if not acc or acc.startswith("#"): # Ignora linhas vazias ou comentários
+            acc = line.strip()
+            if not acc or acc.startswith("#"):
                 continue
-            if not acc.startswith(("GCF_", "GCA_")): # Checa integridade do accession
+            if not acc.startswith(("GCF_", "GCA_")):
                 print(f"Aviso: accession suspeito '{acc}' ignorado.")
                 continue
             accessions.add(acc)
@@ -65,7 +65,7 @@ def read_accession_list(filepath, column=None):
                         column = i
                         break
                 else:
-                    column = 0  # fallback: primeira coluna
+                    column = 0
             elif isinstance(column, str):
                 column = header.index(column)
             for row in reader:

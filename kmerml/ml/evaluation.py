@@ -1,17 +1,22 @@
 from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
 import numpy as np
-from typing import Dict, Any
+from typing import Dict
 
 def evaluate_clustering(X: np.ndarray, labels: np.ndarray) -> Dict[str, float]:
     """
-    Calcula múltiplas métricas de avaliação para clustering
+    Calculate clustering metrics
     
     Args:
-        X: Dados originais
-        labels: Labels dos clusters
+        X: Original data
+        labels: clusters labels
         
     Returns:
-        Dict com métricas calculadas
+        Dict with calculated metrics:
+            - silhouette: Silhouette score
+            - calinski_harabasz: Calinski-Harabasz index
+            - davies_bouldin: Davies-Bouldin index
+            - n_clusters: Number of clusters
+            - noise_points: Number of noise points (if applicable)
     """
     if len(set(labels)) < 2:
         return {
@@ -22,7 +27,7 @@ def evaluate_clustering(X: np.ndarray, labels: np.ndarray) -> Dict[str, float]:
             'noise_points': sum(labels == -1) if -1 in labels else 0
         }
     
-    # Remove pontos de ruído para métricas que não suportam
+    # Remove noise points if data does not support it
     mask = labels != -1
     X_clean = X[mask]
     labels_clean = labels[mask]
@@ -46,18 +51,16 @@ def evaluate_clustering(X: np.ndarray, labels: np.ndarray) -> Dict[str, float]:
 
 def rank_results(results: list, primary_metric: str = 'silhouette') -> list:
     """
-    Rankeia resultados por métrica primária
+    Ranks results based on the primary metric.
     
     Args:
-        results: Lista de dicionários com resultados
-        primary_metric: Métrica para ranking
-        
+        results: Dict with results
+        primary_metric: Primary metric to use for ranking
     Returns:
-        Lista ordenada por melhor resultado
+        Sorted array of results based on the primary metric.
     """
     if primary_metric == 'davies_bouldin':
-        # Para Davies-Bouldin, menor é melhor
+        # For davies_bouldin, lower is better
         return sorted(results, key=lambda x: x['metrics'][primary_metric])
     else:
-        # Para silhouette e calinski_harabasz, maior é melhor
         return sorted(results, key=lambda x: x['metrics'][primary_metric], reverse=True)

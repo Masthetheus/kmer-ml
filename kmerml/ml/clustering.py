@@ -1,10 +1,10 @@
 from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 from sklearn.mixture import GaussianMixture
-from typing import Dict, Any, List
+from typing import Dict, List
 import numpy as np
 
 class ClusteringMethod:
-    """Base class para métodos de clustering"""
+    """Base class for clustering methods"""
     
     def __init__(self, name: str, estimator, param_grid: Dict[str, List]):
         self.name = name
@@ -12,12 +12,12 @@ class ClusteringMethod:
         self.param_grid = param_grid
     
     def fit_predict(self, X: np.ndarray, **params) -> np.ndarray:
-        """Executa clustering com parâmetros específicos"""
+        """Execute clustering with given parameters"""
         model = self.estimator(**params)
         return model.fit_predict(X)
 
 def get_clustering_methods() -> Dict[str, ClusteringMethod]:
-    """Retorna dicionário com todos os métodos de clustering disponíveis"""
+    """Returns a dictionary of available clustering methods"""
     methods = {
         'kmeans': ClusteringMethod(
             name='KMeans',

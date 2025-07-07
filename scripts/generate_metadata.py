@@ -15,10 +15,6 @@ def gather_metadata(option, genome_input_dir=None, kmer_input_dir=None, output_f
         kmer_input_dir (str): Directory containing k-mer files
         output_file (str): Path to output metadata file
     """
-    from kmerml.utils.genome_metadata import GenomeMetadataManager
-    from kmerml.utils.kmer_metadata import KmerMetadataManager
-    from kmerml.utils.path_utils import find_files
-    
     option = option.lower()
     
     if option == "genome":
@@ -66,9 +62,6 @@ def gather_metadata(option, genome_input_dir=None, kmer_input_dir=None, output_f
 
 def main():
     """Main entry point for the script."""
-    import argparse
-    import sys
-    
     parser = argparse.ArgumentParser(description='Generate metadata for genomes and/or k-mers')
     parser.add_argument('option', choices=['genome', 'kmer', 'both'], 
                         help='Type of metadata to gather')

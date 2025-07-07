@@ -10,14 +10,14 @@ def plot_clustering_results(X: np.ndarray,
                           output_path: Optional[str] = None,
                           biological_labels: Optional[np.ndarray] = None) -> None:
     """
-    Plota resultados de clustering
+    Plots clustering results in 2D space.
     
     Args:
-        X: Dados (assumindo 2D após redução de dimensionalidade)
-        labels: Labels dos clusters
-        method_name: Nome do método
-        output_path: Caminho para salvar
-        biological_labels: Labels biológicos (família, etc.)
+        X: Data (assuming 2D for visualization)
+        labels: Labels for clusters
+        method_name: Method name
+        output_path: Path to save the plot (if None, only shows plot)
+        biological_labels: Family, genus or species labels for coloring (optional)
     """
     fig, axes = plt.subplots(1, 2 if biological_labels is not None else 1, 
                             figsize=(15, 6) if biological_labels is not None else (8, 6))
@@ -34,7 +34,7 @@ def plot_clustering_results(X: np.ndarray,
     ax1.set_xlabel("Component 1")
     ax1.set_ylabel("Component 2")
     
-    # Plot 2: Biological labels (se disponível)
+    # Plot 2: Biological labels
     if biological_labels is not None:
         unique_labels = np.unique(biological_labels)
         colors = plt.cm.tab20(np.linspace(0, 1, len(unique_labels)))
@@ -58,42 +58,30 @@ def plot_clustering_results(X: np.ndarray,
 
 def plot_scout_summary(results: Dict[str, Any], output_dir: str):
     """
-    Plota resumo dos resultados de scouting
+    Plots a summary of clustering scouting results.
     """
     all_results = results['all_results']
     
-    # Extrai dados para plotting
+    # Data extraction
     methods = [r['method'] for r in all_results]
     silhouette_scores = [r['metrics']['silhouette'] for r in all_results]
     n_clusters = [r['metrics']['n_clusters'] for r in all_results]
     
     fig, axes = plt.subplots(2, 2, figsize=(15, 12))
     
-    # Plot 1: Silhouette por método
+    # Plot 1: Silhouette per method
     df_plot = pd.DataFrame({'Method': methods, 'Silhouette': silhouette_scores})
     sns.boxplot(data=df_plot, x='Method', y='Silhouette', ax=axes[0, 0])
-    axes[0, 0].set_title('Silhouette Score por Método')
+    axes[0, 0].set_title('Silhouette Score per Method')
     axes[0, 0].tick_params(axis='x', rotation=45)
     
-    # Plot 2: Número de clusters por método
+    # Plot 2: Clusters per method
     df_plot2 = pd.DataFrame({'Method': methods, 'N_Clusters': n_clusters})
     sns.boxplot(data=df_plot2, x='Method', y='N_Clusters', ax=axes[0, 1])
-    axes[0, 1].set_title('Número de Clusters por Método')
+    axes[0, 1].set_title('Clusters found per Method')
     axes[0, 1].tick_params(axis='x', rotation=45)
     
-    # Plot 3: Top 10 resultados
-    top_10 = results['ranked_results'][:10]
-    top_methods = [r['method'] for r in top_10]
-    top_scores = [r['metrics']['silhouette'] for r in top_10]
-    
-    axes[1, 0].barh(range(len(top_10)), top_scores)
-    axes[1, 0].set_yticks(range(len(top_10)))
-    axes[1, 0].set_yticklabels([f"{m} ({r['metrics']['n_clusters']} clusters)" 
-                               for m, r in zip(top_methods, top_10)])
-    axes[1, 0].set_xlabel('Silhouette Score')
-    axes[1, 0].set_title('Top 10 Melhores Resultados')
-    
-    # Plot 4: Correlação entre métricas
+    # Plot 3: Metrics correlation
     metrics_data = {
         'Silhouette': [r['metrics']['silhouette'] for r in all_results],
         'Calinski-Harabasz': [r['metrics']['calinski_harabasz'] for r in all_results],
@@ -102,7 +90,7 @@ def plot_scout_summary(results: Dict[str, Any], output_dir: str):
     
     df_corr = pd.DataFrame(metrics_data)
     sns.heatmap(df_corr.corr(), annot=True, ax=axes[1, 1])
-    axes[1, 1].set_title('Correlação entre Métricas')
+    axes[1, 1].set_title('Metrics correlation')
     
     plt.tight_layout()
     plt.savefig(f"{output_dir}/scout_summary.png", dpi=300, bbox_inches='tight')
